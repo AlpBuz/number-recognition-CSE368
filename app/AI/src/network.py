@@ -12,9 +12,19 @@ class Net(nn.Module):
         self.conv2_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(320, 50)
         self.fc2 = nn.Linear(50, 10)
+    
+
+    def rgb_to_grayscale(self, x):
+        # Convert RGB to Grayscale by averaging the 3 channels
+        return x.mean(dim=1, keepdim=True)
 
     # the way we compute our output using the given layers and functions
     def forward(self, x):
+        # Check if the input is RGB (3 channels)
+        if x.size(1) == 3:
+            x = self.rgb_to_grayscale(x)
+
+
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
         x = x.view(-1, 320)
