@@ -11,10 +11,15 @@
         <div class="form-submission-section">
             <h1>Upload Your Image:</h1>
             <div class="form-container">
-                <form action="/upload" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" id="image">
-                    <button type="submit" onclick="uploadImage()">Upload</button>
-                </form>
+                <form method="post" enctype="multipart/form-data" onsubmit="return uploadImage(event)">
+                    <input type="file" name="file" id="image" onchange="previewImage(event)" required>
+                    <div class="image-preview">
+                        <h3>Image Preview:</h3>
+                        <img id="preview-image" src="" alt="Image Preview">
+                    </div>
+                    <button type="submit">Upload</button>
+                </form>                
+                
             </div>
         </div>
 
@@ -25,7 +30,10 @@
         <div class="results-section">
             <h1>Results here:</h1>
             <div class="results-container">
+                <h3>uploaded Image:</h3>
                 <img id="uploaded-image" src="" alt="Uploaded Image">
+
+                <h3>AI Prediction:</h3>
                 <p id="result-text"></p>
                 <button onclick="clearResults()">Clear Results</button>
             </div>

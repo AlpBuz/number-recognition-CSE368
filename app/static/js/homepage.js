@@ -10,10 +10,10 @@ async function uploadImage(event){
             method: 'POST',
             body: formData
         });
-        const data = await response.json();
 
         if (response.ok){
-
+            const data = await response.json();
+            displayResults(data)
         }else{
             alert("something went wrong, try again")
         }
@@ -24,10 +24,40 @@ async function uploadImage(event){
 }
 
 
+function previewImage(event){
+    const imageInput = event.target;
+    const preview = document.getElementById('preview-image');
+    const file = imageInput.files[0];
 
+    if (file){
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result; // Set the preview image's src
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function displayResults(data){
+    const numberPredicted = document.getElementById('result-text');
+    const imageInput = document.getElementById('uploaded-image');
+
+    if (data.filePath) {
+        imageInput.src = data.filePath;
+    }
+
+    if (data.prediction){
+        numberPredicted.textContent = data.prediction
+    }else{
+        numberPredicted.textContent = 'No prediction was made'
+    }
+
+}
 
 function clearResults(){
-    var uploaedImage = document.getElementById("uploaded-image");
+    const numberPredicted = document.getElementById('result-text');
+    const imageInput = document.getElementById('uploaded-image');
 
-    uploadImage.src = "";
+    imageInput.src = "";
+    numberPredicted.textContent = "";
 }
