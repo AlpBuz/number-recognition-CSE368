@@ -21,7 +21,7 @@ run 'python3 main.py'
 enter the last completed epoch to continue from (curently 10) to better the model
 '''
 
-EPOCHS = 5  # number of times we use the dataset
+EPOCHS = 100  # number of times we use the dataset
 
 # training optimizations
 LEARNING_RATE = 0.01
@@ -69,10 +69,10 @@ log_interval = 10 # determines how frequently progress is printed, 100 would be 
 
 # checking if we have a saved model to continue training, if not we start from scratch
 start_epoch = 1 # default epoch to start from
-if os.path.exists('../results/model.pth') and os.path.exists('../results/optimizer.pth'):
+if os.path.exists('app\AI\\results\model.pth') and os.path.exists('app\AI\\results\model.pth'):
     print("Model already found, continuing training.")
-    network.load_state_dict(torch.load('../results/model.pth'))
-    optimizer.load_state_dict(torch.load('../results/optimizer.pth'))
+    network.load_state_dict(torch.load('app\AI\\results\model.pth'))
+    optimizer.load_state_dict(torch.load('app\AI\\results\optimizer.pth'))
     start_epoch = int(input("Enter the last completed epoch to continue from: ")) + 1
 else:
     print("No model found, starting from scratch.")

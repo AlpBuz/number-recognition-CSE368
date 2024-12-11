@@ -17,8 +17,8 @@ def train(network, optimizer, train_loader, epoch, log_interval, train_losses, t
       train_losses.append(loss.item())
       train_counter.append(
         (batch_idx*64) + ((epoch-1)*len(train_loader.dataset)))
-      torch.save(network.state_dict(), '../results/model.pth')
-      torch.save(optimizer.state_dict(), '../results/optimizer.pth')
+      torch.save(network.state_dict(), 'app\AI\\results\model.pth')
+      torch.save(optimizer.state_dict(), 'app\AI\\results\optimizer.pth')
 
 # testing the network
 def test(network, test_loader, test_losses):
