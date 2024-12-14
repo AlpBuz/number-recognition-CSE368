@@ -1,7 +1,10 @@
 import torch
+from torchvision import datasets
+from torchvision.transforms import ToTensor
 import torchvision
 import torch.optim as optim
 import torch.nn.functional as F
+from torch.optim.lr_scheduler import StepLR
 # for continuing training
 import os
 # functions/classes
@@ -21,10 +24,10 @@ run 'python3 main.py'
 enter the last completed epoch to continue from (curently 10) to better the model
 '''
 
-EPOCHS = 100  # number of times we use the dataset
+EPOCHS = 50  # number of times we use the dataset
 
 # training optimizations
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.05
 MOMENTUM = 0.5
 
 # batch sizes
@@ -39,9 +42,24 @@ torch.manual_seed(seed)
 # more datasets can be found in: https://pytorch.org/vision/stable/datasets.html
 # MNIST chosen by tutorial
 
+train_data = datasets.MNIST(
+    root = 'data',
+    train = True,
+    transform = ToTensor(),
+    download = True
+)
+
+test_data = datasets.MNIST(
+    root = 'data',
+    train = False,
+    transform = ToTensor(),
+    download = True
+)
+
+
 # loading training data 
 train_loader = torch.utils.data.DataLoader(
-    torchvision.datasets.MNIST('/files/', train=True, download=True,
+    torchvision.datasets.MNIST('data', train=True, download=True,
         transform=torchvision.transforms.Compose([
         torchvision.transforms.ToTensor()
     ])),
@@ -49,14 +67,14 @@ train_loader = torch.utils.data.DataLoader(
 
 # lodaing testing data
 test_loader = torch.utils.data.DataLoader(
-    torchvision.datasets.MNIST('/files/', train=False, download=True,
+    torchvision.datasets.MNIST('data', train=False, download=True,
         transform=torchvision.transforms.Compose([
         torchvision.transforms.ToTensor()
     ])),
     batch_size=TESTING_BATCH, shuffle=True)
 
 # creating the network
-learning_rate = 0.01   
+learning_rate = 0.05   
 momentum = 0.5
 network = Net()
 optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
@@ -80,4 +98,6 @@ else:
 test(network, test_loader, test_losses)
 for epoch in range(start_epoch, EPOCHS + start_epoch):
     train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter)
+    train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=True, blur_radius=2.0)
     test(network, test_loader, test_losses)
+    test(network, test_loader, test_losses, apply_blur=True, blur_radius=2.0)
