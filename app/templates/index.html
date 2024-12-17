@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Recognition</title>
+    <link rel="stylesheet" href="../static/css/homepage.css">
+</head>
+<body>
+
+    <div class="container">
+        <!--Section for user to upload image-->
+        <div class="form-submission-section">
+            <h1>Upload Your Image:</h1>
+            <div class="form-container">
+                <form method="post" enctype="multipart/form-data" onsubmit="return uploadImage(event)">
+                    <input type="file" name="file" id="image" onchange="previewImage(event)" required>
+                    <div class="image-preview">
+                        <h3>Image Preview:</h3>
+                        <img id="preview-image" src="" alt="Image Preview">
+                    </div>
+                    <button type="submit">Upload</button>
+                </form>                
+                
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!--Section to show results-->
+        <div class="results-section">
+            <h1>Results here:</h1>
+            <div class="results-container">
+                <h3>uploaded Image:</h3>
+                <img id="uploaded-image" src="" alt="Uploaded Image">
+
+                <h3>AI Prediction:</h3>
+                <p id="result-text"></p>
+                <button onclick="clearResults()">Clear Results</button>
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/homepage.js"></script>
+</body>
+</html>
