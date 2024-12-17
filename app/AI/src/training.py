@@ -17,9 +17,9 @@ def train(network, optimizer, train_loader, epoch, log_interval, train_losses, t
       for img in data:
           pil_image = to_pil_image(img)
           blurred_pil_image = pil_image.filter(ImageFilter.GaussianBlur(blur_radius))
-          blurred_data.append(to_tensor(blurred_pil_image))
+          blurred_data.append(to_tensor(blurred_pil_image).to(device))
       data = torch.stack(blurred_data)
-
+      data.to(device)
 
     optimizer.zero_grad()
     output = network(data)
@@ -38,8 +38,8 @@ def train(network, optimizer, train_loader, epoch, log_interval, train_losses, t
       train_losses.append(loss.item())
       train_counter.append(
         (batch_idx*64) + ((epoch-1)*len(train_loader.dataset)))
-      torch.save(network.state_dict(), 'app\AI\\results\model.pth')
-      torch.save(optimizer.state_dict(), 'app\AI\\results\optimizer.pth')
+      torch.save(network.state_dict(), 'app\\AI\\results\\model.pth')
+      torch.save(optimizer.state_dict(), 'app\\AI\\results\\optimizer.pth')
   train_loss /= len(train_loader.dataset)
   return correct/num_data, (train_loss)
 
@@ -48,17 +48,20 @@ def test(network, test_loader, test_losses, apply_blur=False, blur_radius=1.5):
   network.eval()
   test_loss = 0
   correct = 0
+  
   with torch.no_grad():
     for data, target in test_loader:
+      data, target = data.to(device), target.to(device)
       if apply_blur:
         #apply blur to each testing image
         blurred_data = []
         for img in data:
             pil_image = to_pil_image(img)
             blurred_pil_image = pil_image.filter(ImageFilter.GaussianBlur(blur_radius))
-            blurred_data.append(to_tensor(blurred_pil_image))  
+            blurred_data.append(to_tensor(blurred_pil_image).to(device))  
         data = torch.stack(blurred_data)
-
+        data.to(device)
+      
       output = network(data)
       test_loss += F.nll_loss(output, target, size_average=False).item()
       pred = output.data.max(1, keepdim=True)[1]

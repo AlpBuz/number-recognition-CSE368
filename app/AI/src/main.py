@@ -40,6 +40,8 @@ seed = 1
 torch.backends.cudnn.enabled = False
 torch.manual_seed(seed)
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 # more datasets can be found in: https://pytorch.org/vision/stable/datasets.html
 # MNIST chosen by tutorial
 
@@ -58,6 +60,7 @@ test_data = datasets.MNIST(
 )
 
 
+
 # loading training data 
 train_loader = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('data', train=True, download=True,
@@ -65,7 +68,6 @@ train_loader = torch.utils.data.DataLoader(
         torchvision.transforms.ToTensor()
     ])),
     batch_size=TRAINING_BATCH, shuffle=True)
-
 # lodaing testing data
 test_loader = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('data', train=False, download=True,
@@ -78,6 +80,7 @@ test_loader = torch.utils.data.DataLoader(
 learning_rate = 0.05   
 momentum = 0.5
 network = Net()
+network = network.to(device)
 optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
 
 # training logs
@@ -94,16 +97,17 @@ log_interval = 10 # determines how frequently progress is printed, 100 would be 
 start_epoch = 1 # default epoch to start from
 if os.path.exists('app\AI\\results\model.pth') and os.path.exists('app\AI\\results\optimizer.pth'):
     print("Model already found, continuing training.")
-    network.load_state_dict(torch.load('app\AI\\results\model.pth'))
-    optimizer.load_state_dict(torch.load('app\AI\\results\optimizer.pth'))
+    network.load_state_dict(torch.load('app\\AI\\results\\model.pth'))
+    optimizer.load_state_dict(torch.load('app\\AI\\results\\optimizer.pth'))
     start_epoch = int(input("Enter the last completed epoch to continue from: ")) + 1
 else:
     print("No model found, starting from scratch.")
 
-test(network, test_loader, test_losses)
+# test(network, test_loader, test_losses)
 for epoch in range(start_epoch, EPOCHS + start_epoch):
     train_accs.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter))
     train_accs_blur.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=True, blur_radius=2.0))
+    
     test_accs.append(test(network, test_loader, test_losses))
     test_accs_blur.append(test(network, test_loader, test_losses, apply_blur=True, blur_radius=2.0))
 
