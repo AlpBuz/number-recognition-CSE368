@@ -117,7 +117,7 @@ for epoch in range(start_epoch, EPOCHS + start_epoch):
 trainClear = plt.plot([i[0] for i in train_accs], label="Train")
 testClear = plt.plot([i[0].item() for i in test_accs], label="Test")
 trainBlur = plt.plot([i[0] for i in train_accs_blur], label="Train (Blur)")
-testBlur = plt.plot([i[0] for i in test_accs_blur], label="Test (Blur)")
+testBlur = plt.plot([i[0].item() for i in test_accs_blur], label="Test (Blur)")
 
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
