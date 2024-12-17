@@ -2,11 +2,15 @@ import torch
 import torch.nn.functional as F
 from torchvision.transforms.functional import to_pil_image, to_tensor
 from PIL import ImageFilter
-
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # training the network
 def train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=False, blur_radius=1.5):
+  train_loss = 0
+  correct = 0
+  num_data = 0
   network.train()
   for batch_idx, (data, target) in enumerate(train_loader):
+    data, target = data.to(device), target.to(device)
     if apply_blur:
       # Apply blur to each image in the batch
       blurred_data = []
@@ -22,6 +26,11 @@ def train(network, optimizer, train_loader, epoch, log_interval, train_losses, t
     loss = F.nll_loss(output, target)
     loss.backward()
     optimizer.step()
+    pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+    correct += pred.eq(target.view_as(pred)).sum().item()
+    num_data += target.shape[0]
+    train_loss += loss.sum().item()
+
     if batch_idx % log_interval == 0:
       print('Train Epoch: (Blur: {}) {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(apply_blur,
         epoch, batch_idx * len(data), len(train_loader.dataset),
@@ -31,6 +40,8 @@ def train(network, optimizer, train_loader, epoch, log_interval, train_losses, t
         (batch_idx*64) + ((epoch-1)*len(train_loader.dataset)))
       torch.save(network.state_dict(), 'app\AI\\results\model.pth')
       torch.save(optimizer.state_dict(), 'app\AI\\results\optimizer.pth')
+  train_loss /= len(train_loader.dataset)
+  return correct/num_data, (train_loss)
 
 # testing the network
 def test(network, test_loader, test_losses, apply_blur=False, blur_radius=1.5):
@@ -58,3 +69,4 @@ def test(network, test_loader, test_losses, apply_blur=False, blur_radius=1.5):
   print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
     test_loss, correct, len(test_loader.dataset),
     100. * correct / len(test_loader.dataset)))
+  return (correct/len(test_loader.dataset)), test_loss

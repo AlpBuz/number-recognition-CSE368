@@ -10,6 +10,7 @@ import os
 # functions/classes
 from network import Net
 from training import train, test
+import matplotlib.pyplot as plt
 
 
 # grab the right install here: https://pytorch.org/get-started/locally/
@@ -24,7 +25,7 @@ run 'python3 main.py'
 enter the last completed epoch to continue from (curently 10) to better the model
 '''
 
-EPOCHS = 50  # number of times we use the dataset
+EPOCHS = 10  # number of times we use the dataset
 
 # training optimizations
 LEARNING_RATE = 0.05
@@ -83,11 +84,15 @@ optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
 train_losses = []
 train_counter = []
 test_losses = []
+train_accs = []
+train_accs_blur = []
+test_accs = []
+test_accs_blur = []
 log_interval = 10 # determines how frequently progress is printed, 100 would be less frequent
 
 # checking if we have a saved model to continue training, if not we start from scratch
 start_epoch = 1 # default epoch to start from
-if os.path.exists('app\AI\\results\model.pth') and os.path.exists('app\AI\\results\model.pth'):
+if os.path.exists('app\AI\\results\model.pth') and os.path.exists('app\AI\\results\optimizer.pth'):
     print("Model already found, continuing training.")
     network.load_state_dict(torch.load('app\AI\\results\model.pth'))
     optimizer.load_state_dict(torch.load('app\AI\\results\optimizer.pth'))
@@ -97,7 +102,19 @@ else:
 
 test(network, test_loader, test_losses)
 for epoch in range(start_epoch, EPOCHS + start_epoch):
-    train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter)
-    train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=True, blur_radius=2.0)
-    test(network, test_loader, test_losses)
-    test(network, test_loader, test_losses, apply_blur=True, blur_radius=2.0)
+    train_accs.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter))
+    train_accs_blur.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=True, blur_radius=2.0))
+    test_accs.append(test(network, test_loader, test_losses))
+    test_accs_blur.append(test(network, test_loader, test_losses, apply_blur=True, blur_radius=2.0))
+
+trainClear = plt.plot([e for e in range(len(train_accs))], train_accs, label="Train")
+testClear = plt.plot([e for e in range(len(test_accs))], test_accs, label="Test")
+trainBlur = plt.plot([e for e in range(len(train_accs_blur))], train_accs_blur, label="Train (Blur)")
+testBlur = plt.plot([e for e in range(len(test_accs_blur))], test_accs_blur, label="Test (Blur)")
+
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.show()
+
+#Credit to Trenton McKinney at https://stackoverflow.com/questions/13588920/stop-matplotlib-repeating-labels-in-legend for preventing duplicate labels
