@@ -105,16 +105,19 @@ else:
 
 # test(network, test_loader, test_losses)
 for epoch in range(start_epoch, EPOCHS + start_epoch):
+    
+    # train() returns (accuracy, loss)
     train_accs.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter))
     train_accs_blur.append(train(network, optimizer, train_loader, epoch, log_interval, train_losses, train_counter, apply_blur=True, blur_radius=2.0))
     
+    # test returns (tensor, loss)
     test_accs.append(test(network, test_loader, test_losses))
     test_accs_blur.append(test(network, test_loader, test_losses, apply_blur=True, blur_radius=2.0))
 
-trainClear = plt.plot([e for e in range(len(train_accs))], train_accs, label="Train")
-testClear = plt.plot([e for e in range(len(test_accs))], test_accs, label="Test")
-trainBlur = plt.plot([e for e in range(len(train_accs_blur))], train_accs_blur, label="Train (Blur)")
-testBlur = plt.plot([e for e in range(len(test_accs_blur))], test_accs_blur, label="Test (Blur)")
+trainClear = plt.plot([i[0] for i in train_accs], label="Train")
+testClear = plt.plot([i[0].item() for i in test_accs], label="Test")
+trainBlur = plt.plot([i[0] for i in train_accs_blur], label="Train (Blur)")
+testBlur = plt.plot([i[0] for i in test_accs_blur], label="Test (Blur)")
 
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
